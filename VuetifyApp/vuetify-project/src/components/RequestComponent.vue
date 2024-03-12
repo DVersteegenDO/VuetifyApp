@@ -41,8 +41,12 @@
 
             <div class="request-input-group">
 
-                <v-select v-model="selectedArtist" :items="artists" item-text="artistName" return-object
-                    filled></v-select>
+                <!-- <v-select v-model="selectedArtist" :items="artists" item-text="artistName" return-object
+                    filled></v-select> -->
+
+                <v-select v-model="selectedArtist" :hint="`${selectedArtist.artistName}, ${selectedArtist.id}`"
+                    :items="artists" item-title="artistName" item-value="album" label="Select" persistent-hint
+                    return-object single-line @change="onChange(console.log('Banaan'))"></v-select>
 
                 <!-- <v-select label="Select" :item-props="itemProps" :items="items" variant="outlined">
                 </v-select> -->
@@ -98,21 +102,25 @@ export default {
             loading: false,
             holding: true,
             selectedArtist: {
-                artistName: "Taylor Swift",
-                album: "Lover"
+                artistName: "Imagine Dragons",
+                id: 0
+                // album: "Origins"
             },
             artists: [
                 {
-                    artistName: "Taylor Swift",
-                    album: "Lover"
+                    artistName: "Imagine Dragons",
+                    id: 0
+                    // album: "Origins"
                 },
                 {
-                    artistName: "Olivia Rodrigo",
-                    album: "Sour"
+                    artistName: "The Weeknd",
+                    id: 1
+                    // album: "The Highlights"
                 },
                 {
-                    artistName: "Kep1er",
-                    album: "Lovestruck"
+                    artistName: "Ed Sheeran",
+                    id: 2
+                    // album: "÷"
                 }
             ]
         }
@@ -139,15 +147,6 @@ export default {
 
             }
         },
-        // urlValue : {
-        //     get() {
-        //         if (this.column != 'ID') {
-        //             return `${this.columnValue[0].toLowerCase()}`
-        //         } else {
-        //             // return `${this.defaultUrl}/${this.id}`
-        //         }
-        //     }
-        // }
     },
 
     methods: {
@@ -193,12 +192,14 @@ export default {
             }
         },
         showData(response) {
-            // console.log(JSON.parse(JSON.stringify(response.data[0]['name'])));
-            this.id = JSON.parse(JSON.stringify(response.data[0]['id']));
-            this.name = JSON.parse(JSON.stringify(response.data[0]['name']));
-            this.followers = JSON.parse(JSON.stringify(response.data[0]['followers']));
-            this.country = JSON.parse(JSON.stringify(response.data[0]['country']));
-            this.birthdate = JSON.parse(JSON.stringify(response.data[0]['birthdate']));
+
+            JSON.parse(JSON.stringify(response.data)).forEach((item, index) => {
+
+                this.artists.push({
+                    artistName: item.name,
+                    id: item.id
+                })
+            })
         },
         showSingleData(response) {
             this.id = JSON.parse(JSON.stringify(response.data['id']));
@@ -206,6 +207,14 @@ export default {
             this.followers = JSON.parse(JSON.stringify(response.data['followers']));
             this.country = JSON.parse(JSON.stringify(response.data['country']));
             this.birthdate = JSON.parse(JSON.stringify(response.data['birthdate']));
+        },
+    },
+    watch: {
+        selectedArtist(val) {
+            console.log(toRaw(val));
+            if (this.selectedArtist != val) {
+                console.log(this.selectedArtist);
+            }
         }
     }
 }

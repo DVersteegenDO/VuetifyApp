@@ -1,6 +1,7 @@
 <template>
     <div id="request-container" class="container div-style">
 
+        <!--First Container-->
         <div id="request-input-container" class="request-container">
             <h1>Send {{ requestType }} Request</h1>
 
@@ -12,6 +13,13 @@
             <div class="request-input-group">
                 <v-text-field v-bind:label=column variant="outlined" v-model="columnValue"
                     class="text-field"></v-text-field>
+            </div>
+
+            <div class="request-input-group">
+                <v-radio-group v-model="dataType">
+                    <v-radio label="Add items to dropdown" name="dataType" value="select" class="radiobutton"></v-radio>
+                    <v-radio label="Show items in a table" name="dataType" value="table" class="radiobutton"></v-radio>
+                </v-radio-group>
             </div>
 
             <div class="request-input-group">
@@ -36,24 +44,34 @@
 
         </div>
 
-        <div v-if="holding == true" id="request-items-container" class="request-container">
+        <!--Second Container-->
+        <div v-if="artists.length > 0 && dataType === 'select'" id="request-select-container" class="request-container">
             <h1>Current Artist Data</h1>
 
             <div class="request-input-group">
 
-                <!-- <v-select v-model="selectedArtist" :items="artists" item-text="artistName" return-object
-                    filled></v-select> -->
-
                 <v-select v-model="selectedArtist" :hint="`${selectedArtist.artistName}, ${selectedArtist.id}`"
                     :items="artists" item-title="artistName" item-value="album" label="Select" persistent-hint
-                    return-object single-line @change="onChange(console.log('Banaan'))"></v-select>
+                    return-object single-line @change="console.log('Banaan')"></v-select>
 
-                <!-- <v-select label="Select" :item-props="itemProps" :items="items" variant="outlined">
-                </v-select> -->
-                <!-- <p>{{ items[0].value }}</p> -->
             </div>
         </div>
 
+        <!--Third Container-->
+        <div v-if="artists.length > 0 && dataType === 'table'" id="request-table-container" class="request-container">
+            <h1>Retrieved Artist Data</h1>
+
+            <div>
+
+                <v-data-table :items="artists">
+
+                </v-data-table>
+
+            </div>
+
+        </div>
+
+        <!--Fourth Container-->
         <div id="request-result-container" class="request-container">
             <h1>Show {{ requestType }} Data</h1>
 
@@ -96,32 +114,27 @@ export default {
             followers: '',
             country: '',
             birthdate: '',
+            dataType: "select",
             error: '',
             requestType: 'Artist',
             defaultUrl: 'http://192.168.56.56/api/artists',
             loading: false,
-            holding: true,
+            dataType: 'table',
             selectedArtist: {
-                artistName: "Imagine Dragons",
-                id: 0
-                // album: "Origins"
+                id: '',
+                artistName: '',
+                followers: '',
+                country: '',
+                birthdate: ''
             },
             artists: [
-                {
-                    artistName: "Imagine Dragons",
-                    id: 0
-                    // album: "Origins"
-                },
-                {
-                    artistName: "The Weeknd",
-                    id: 1
-                    // album: "The Highlights"
-                },
-                {
-                    artistName: "Ed Sheeran",
-                    id: 2
-                    // album: "÷"
-                }
+                //     {
+                //     artistName: 'Imagine Dragons',
+                //     id: 1
+                // }, {
+                //     artistName: 'The Weeknd',
+                //     id: 2
+                // }
             ]
         }
 
@@ -129,11 +142,7 @@ export default {
     computed: {
         requestUrl: {
             get() {
-                // if (this.column != 'ID') {
-                //     return `${this.defaultUrl}?${this.column.toLowerCase()}=${this.columnValue}`
-                // } else {
-                //     return `${this.defaultUrl}/${this.columnValue}`
-                // }
+
                 switch (this.column) {
                     case "ID":
                         return `${this.defaultUrl}/${this.columnValue}`
@@ -144,7 +153,6 @@ export default {
                     case "Country":
                         return `${this.defaultUrl}?country=${this.columnValue}`;
                 }
-
             }
         },
     },
@@ -173,6 +181,7 @@ export default {
                     if (this.column == "ID") {
                         this.showSingleData(response.data);
                     } else {
+                        // console.log(response.data);
                         this.showData(response.data);
                     }
 
@@ -195,13 +204,26 @@ export default {
 
             JSON.parse(JSON.stringify(response.data)).forEach((item, index) => {
 
+                if (index == false) {
+                    this.selectedArtist['id'] = item.id;
+                    this.selectedArtist['artistName'] = item.name;
+                    this.selectedArtist['country'] = item.country;
+                    this.selectedArtist['followers'] = item.followers;
+                    this.selectedArtist['birthdate'] = item.birthdate;
+                }
+
                 this.artists.push({
+                    id: item.id,
                     artistName: item.name,
-                    id: item.id
+                    followers: item.followers,
+                    country: item.country,
+                    birthdate: item.birthdate
                 })
             })
         },
         showSingleData(response) {
+            console.log("Banaan");
+            console.log(response);
             this.id = JSON.parse(JSON.stringify(response.data['id']));
             this.name = JSON.parse(JSON.stringify(response.data['name']));
             this.followers = JSON.parse(JSON.stringify(response.data['followers']));
@@ -211,10 +233,9 @@ export default {
     },
     watch: {
         selectedArtist(val) {
-            console.log(toRaw(val));
-            if (this.selectedArtist != val) {
-                console.log(this.selectedArtist);
-            }
+            this.columnValue = JSON.parse(JSON.stringify(val['id']));
+            this.column = "ID";
+            this.tryFetchData();
         }
     }
 }
@@ -259,5 +280,22 @@ p {
 button {
     width: 100%;
     margin-top: 10px;
+}
+
+.radiobutton {
+    font-weight: bolder;
+    font-size: 24px;
+}
+
+.radiobutton>label {
+    margin-left: 10px;
+}
+
+#request-table-container {
+    width: 800px;
+}
+
+#request-table-container>table {
+    margin:10px;
 }
 </style>

@@ -11,6 +11,7 @@ import { registerPlugins } from '@/plugins'
 import App from './App.vue'
 import RequestItem from './components/RequestComponent.vue'
 import SelectItem from './components/SelectComponent.vue'
+import PokemonItem from './components/PokemonComponent.vue'
 
 // Composables
 import { createApp } from 'vue'
@@ -19,6 +20,7 @@ const app = createApp(App)
 
 app.component('request-item', RequestItem)
 app.component('select-item', SelectItem)
+app.component('pokemon-item', PokemonItem)
 
 registerPlugins(app)
 

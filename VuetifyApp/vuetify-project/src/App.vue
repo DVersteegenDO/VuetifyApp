@@ -4,6 +4,7 @@
       <div id="topbar" class="div-style">
         <h1>{{ title }}</h1>
       </div>
+      <pokemon-item />
       <request-item />
       <!-- <select-item></select-item> -->
     </v-main>

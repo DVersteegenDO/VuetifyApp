@@ -9,8 +9,8 @@
                     <div class="pokemon-container-top-content">
                         <h1>Search For Pokemon</h1>
 
-                        <v-text-field v-model="pokemonId" v-on:keyup.enter="tryFetchData" label="Pokemon" variant="outlined"
-                            class="text-field"></v-text-field>
+                        <v-text-field v-model="pokemonId" v-on:keyup.enter="tryFetchData" label="Pokemon"
+                            variant="outlined" class="text-field"></v-text-field>
 
                         <!-- <v-text-field v-model="enterTest" v-on:keyup.enter="console.log(enterTest)" label="Test" variant="outlined"
                             class="text-field"></v-text-field> -->
@@ -25,10 +25,15 @@
                         <!-- <input v-model="enterTest" @keyup.enter="console.log(enterTest)" /> -->
 
                         <p>{{ requestUrl }}</p>
+                        <p>{{ image }}</p>
                     </div>
                 </div>
 
                 <div id="pokemon-container-top-right">
+                    <img v-bind:src="image" />
+                </div>
+
+                <!-- <div id="pokemon-container-top-right">
                     <div class="pokemon-container-top-content">
                         <h1>Find Url</h1>
 
@@ -37,9 +42,8 @@
                             class="select" variant="outlined">
                         </v-select>
 
-                        <!-- <p>{{ requestUrl }}</p> -->
                     </div>
-                </div>
+                </div> -->
 
             </div>
 
@@ -52,18 +56,26 @@
 
 <script>
 import axios from 'axios'
-import { reactive, toRaw } from "vue";
 export default {
     data() {
         return {
             enterTest: '',
             onPageLoad: true,
-            pokemonId: '',
+            pokemonId: 'eevee',
             loading: false,
             pokemon: [],
+            image: './src/assets/logo.png',
+            pokemonData: [
+                {
+                    name: this.pokemonId,
+                    image: '',
+                    type: ''
+                }
+
+            ],
             selectedUrl: {
                 type: 'Base',
-                url: 'https://pokeapi.co/api/v2/',
+                url: 'https://pokeapi.co/api/v2/pokemon/',
             },
             urls: []
         }
@@ -97,8 +109,11 @@ export default {
                         this.updateSelect(response.data);
                         this.onPageLoad = false;
                     } else {
-                        console.log(response);
+                        this.showPokemonData(response.data)
                     }
+                })
+                .catch(error => {
+                    this.handleErrors(error.response);
                 })
                 .finally(() => {
                     this.loading = false;
@@ -113,12 +128,40 @@ export default {
                     url: response[a]
                 })
             }
+        },
+        handleErrors(response) {
+            switch (response.status) {
+                case 404:
+                    console.log('404');
+                    break;
+            }
+        },
+        showPokemonData(response) {
+
+            var count = 0;
+            console.log(response.sprites);
+            for (var i in response.sprites) {
+                if (count == 4) {
+                    this.image = response.sprites[i];
+                }
+                count++
+            }
+            // console.log(response.sprites);
+            // this.image = response.sprites[3];
         }
     },
     beforeMount() {
         this.tryFetchData();
+    },
+    watch: {
+        pokemonId() {
+            console.log(this.id);
+            this.tryFetchData();
+
+        }
     }
 }
+
 </script>
 
 <style scoped>
@@ -149,7 +192,6 @@ button {
     background-color: rgb(64, 64, 64);
     border: solid 5px black;
     display: flex;
-    /* margin-bottom:10px; */
 }
 
 .pokemon-container-top-content {
@@ -161,7 +203,9 @@ button {
 }
 
 #pokemon-container-top-right {
-    flex-basis: 50%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 #pokemon-container-middle {
@@ -184,5 +228,9 @@ button {
 
 .v-field__input {
     height: 36px !important;
+}
+
+img {
+    height: 120px;
 }
 </style>

@@ -4,9 +4,9 @@
       <div id="topbar" class="div-style">
         <h1>{{ title }}</h1>
       </div>
-      <pokemon-item />
-      <request-item />
-      <!-- <select-item></select-item> -->
+      <!-- <pokemon-item /> -->
+      <!-- <request-item /> -->
+      <watch-item />
     </v-main>
 
   </v-app>
@@ -38,5 +38,4 @@ export default {
 .div-style>h1 {
   margin-left: 10px;
 }
-
 </style>

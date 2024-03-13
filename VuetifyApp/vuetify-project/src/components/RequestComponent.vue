@@ -109,7 +109,7 @@ export default {
         return {
             column: 'ID',
             columnValue: '',
-            id: 0,
+            id: '',
             name: '',
             followers: '',
             country: '',
@@ -165,7 +165,7 @@ export default {
             }
         },
         async tryFetchData() {
-
+            console.log("Banaan");
             try {
                 await this.fetchData();
             } catch (error) {
@@ -222,8 +222,8 @@ export default {
             })
         },
         showSingleData(response) {
-            console.log("Banaan");
-            console.log(response);
+            // console.log("Banaan");
+            // console.log(response);
             this.id = JSON.parse(JSON.stringify(response.data['id']));
             this.name = JSON.parse(JSON.stringify(response.data['name']));
             this.followers = JSON.parse(JSON.stringify(response.data['followers']));
@@ -232,9 +232,12 @@ export default {
         },
     },
     watch: {
-        selectedArtist(val) {
-            this.columnValue = JSON.parse(JSON.stringify(val['id']));
-            this.column = "ID";
+        // selectedArtist(val) {
+        //     this.columnValue = JSON.parse(JSON.stringify(val['id']));
+        //     this.column = "ID";
+        //     this.tryFetchData();
+        // }
+        id() {
             this.tryFetchData();
         }
     }
@@ -296,6 +299,6 @@ button {
 }
 
 #request-table-container>table {
-    margin:10px;
+    margin: 10px;
 }
 </style>

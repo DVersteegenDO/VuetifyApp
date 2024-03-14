@@ -33,7 +33,7 @@
                     <img v-bind:src="image" />
                 </div>
 
-                <!-- <div id="pokemon-container-top-right">
+                <div id="pokemon-container-top-right">
                     <div class="pokemon-container-top-content">
                         <h1>Find Url</h1>
 
@@ -43,12 +43,12 @@
                         </v-select>
 
                     </div>
-                </div> -->
+                </div>
 
             </div>
 
             <div id="pokemon-container-middle">
-                <v-data-table :items="pokemon"></v-data-table>
+                <v-data-table :items="pokemons"></v-data-table>
             </div>
         </div>
     </div>
@@ -61,21 +61,24 @@ export default {
         return {
             enterTest: '',
             onPageLoad: true,
-            pokemonId: 'eevee',
+            pokemonId: '',
             loading: false,
             pokemon: [],
             image: './src/assets/logo.png',
-            pokemonData: [
-                {
-                    name: this.pokemonId,
-                    image: '',
-                    type: ''
-                }
-
-            ],
-            selectedUrl: {
-                type: 'Base',
-                url: 'https://pokeapi.co/api/v2/pokemon/',
+            pokemonName: '',
+            pokemons: [],
+            pokemon: null,
+            selectedUrl: '',
+            images: [],
+            // selectedUrl: {
+            //     type: 'Base',
+            //     url: ''
+            //     // url: 'https://pokeapi.co/api/v2/pokemon/',
+            //     // url: 'https://pokeapi.co/api/v2/pokemon?limit=1090'
+            // },
+            basicUrls: {
+                getAllPokemonUrl: 'https://pokeapi.co/api/v2/pokemon?limit=1090',
+                getOnePokemonUrl: 'https://pokeapi.co/api/v2/pokemon/'
             },
             urls: []
         }
@@ -83,7 +86,7 @@ export default {
     computed: {
         requestUrl: {
             get() {
-                return `${this.selectedUrl.url}${this.pokemonId}`;
+                return `${this.selectedUrl}${this.pokemonId}`;
             }
         },
         pokemonForUrl: {
@@ -106,7 +109,7 @@ export default {
             axios.get(this.requestUrl)
                 .then(response => {
                     if (this.onPageLoad) {
-                        this.updateSelect(response.data);
+                        this.updateTable(response.data.results);
                         this.onPageLoad = false;
                     } else {
                         this.showPokemonData(response.data)
@@ -117,17 +120,81 @@ export default {
                 })
                 .finally(() => {
                     this.loading = false;
+                    this.selectedUrl = this.basicUrls.getOnePokemonUrl;
+                    this.addImages();
                 });
         },
-        updateSelect(response) {
+        getImage(name) {
 
+            axios.get(`https://pokeapi.co/api/v2/pokemon/${name}`)
+                .then(response => {
+
+                    var count = 0;
+
+                    for (var i in response.data.sprites) {
+                        if (count == 4) {
+                            return response.data.sprites[i];
+                        }
+                        count++
+                    }
+                })
+        },
+        updateSelect(response) {
             for (var a in response) {
 
                 this.urls.push({
-                    type: a,
-                    url: response[a]
+                    type: a
                 })
             }
+        },
+        updateTable(response) {
+            for (var a in response) {
+
+                this.pokemons.push({
+
+                    name: response[a].name,
+                })
+            }
+            this.pokemons.forEach(pokemon => {
+                pokemon.name = pokemon.name.charAt(0).toUpperCase() + pokemon.name.slice(1);
+            })
+        },
+        async addImages() {
+
+            console.log('Add');
+            let promises = [];
+            for (i = 0; i < this.pokemons.length; i++) {
+                promises.push(
+                    axios.get('https://pokeapi.co/api/v2/pokemon/' + this.pokemons[i].name).then(response => {
+
+                        console.log(response.sprites[5]);
+                        this.pokemons.push({
+                            image: response.sprites[5]
+                        });
+                    })
+                )
+            }
+
+            Promise.all(promises).then(() => console.log(this.pokemons));
+
+            // this.pokemons.forEach(pokemon => {
+            //    pokemon.image = await getImages();
+            // })
+        },
+        async getImages() {
+
+            axios.get(`https://pokeapi.co/api/v2/pokemon/${name}`)
+                .then(response => {
+
+                    var count = 0;
+
+                    for (var i in response.data.sprites) {
+                        if (count == 4) {
+                            return response.data.sprites[i];
+                        }
+                        count++
+                    }
+                })
         },
         handleErrors(response) {
             switch (response.status) {
@@ -146,19 +213,11 @@ export default {
                 }
                 count++
             }
-            // console.log(response.sprites);
-            // this.image = response.sprites[3];
         }
     },
     beforeMount() {
+        this.selectedUrl = this.basicUrls.getAllPokemonUrl;
         this.tryFetchData();
-    },
-    watch: {
-        pokemonId() {
-            console.log(this.id);
-            this.tryFetchData();
-
-        }
     }
 }
 

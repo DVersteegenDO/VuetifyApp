@@ -5,8 +5,10 @@
         <h1>{{ title }}</h1>
       </div>
       <!-- <pokemon-item /> -->
+      <table-item />
+
       <!-- <request-item /> -->
-      <watch-item />
+      <!-- <watch-item /> -->
     </v-main>
 
   </v-app>
@@ -31,7 +33,7 @@ export default {
 
 .div-style {
   background-color: rgb(64, 64, 64, 0.8);
-  border: solid 3px black;
+  border: solid 5px whitesmoke;
   margin: 10px;
 }
 

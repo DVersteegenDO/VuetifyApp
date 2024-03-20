@@ -69,8 +69,12 @@
                     </div>
 
                     <div class="image-container">
-                        <img v-bind:src="shinyBackImage" class="image" />
+                        <img v-bind:src="shinyImage" class="image" />
                     </div>
+                </div>
+
+                <div class="input_group">
+                    <v-btn variant="outlined" @click="test" class="input">Click Me!</v-btn>
                 </div>
 
             </div>
@@ -84,6 +88,7 @@
 <script>
 
 import axios from 'axios'
+// import { useRouter } from 'vue-router'
 
 export default {
     data() {
@@ -108,12 +113,18 @@ export default {
         defaultBackImage: { get() { return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/${this.currentPokemonId}.png` } },
         shinyBackImage: { get() { return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/shiny/${this.currentPokemonId}.png` } },
         defaultFrontImage: { get() { return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${this.currentPokemonId}.png` } },
-        shinyBackImage: { get() { return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${this.currentPokemonId}.png` } }
+        shinyImage: { get() { return `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/shiny/${this.currentPokemonId}.png` } }
     },
     methods: {
+        test() {
+
+            // const routeData = this.$router.resolve({ name: 'routeName', query: { data: "someData" } });
+            window.open('https://pokeapi.co/api/v2/pokemon/4', '_blank');
+        },
         getPokemonData(response) {
 
-            if (response.target.cellIndex == 3) {
+            // console.log(response.target.localName == 'th');
+            if (response.target.cellIndex == 3 && response.target.localName != 'th') {
 
                 this.currentUrl = response.originalTarget.innerText;
                 axios.get(this.currentUrl)
@@ -192,7 +203,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
 #test-content {
     background-color: rgb(64, 64, 64);
     border: whitesmoke 5px solid;
